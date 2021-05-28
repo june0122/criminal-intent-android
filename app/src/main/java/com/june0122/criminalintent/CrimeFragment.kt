@@ -9,21 +9,27 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Observer
 import java.util.*
+import kotlin.time.hours
+import kotlin.time.minutes
 
 private const val TAG = "CrimeFragment"
 private const val ARG_CRIME_ID = "crime_id"
 private const val DIALOG_DATE = "DialogDate"
+private const val DIALOG_TIME = "DialogTIME"
 private const val REQUEST_DATE = 0
+private const val REQUEST_TIME = 1
 
-class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
+class CrimeFragment : Fragment(), DatePickerFragment.Callbacks, TimePickerFragment.Callbacks {
 
     private lateinit var crime: Crime
     private lateinit var titleField: EditText
     private lateinit var dateButton: Button
+    private lateinit var timeButton: Button
     private lateinit var solvedCheckBox: CheckBox
     private val crimeDetailViewModel: CrimeDetailViewModel by lazy {
         ViewModelProvider(this).get(CrimeDetailViewModel::class.java)
@@ -33,8 +39,6 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         super.onCreate(savedInstanceState)
         crime = Crime()
         val crimeId: UUID = arguments?.getSerializable(ARG_CRIME_ID) as UUID
-//        Log.d(TAG, "args bundle crime ID: $crimeId")
-//        // 궁극적으로는 데이터베이스로부터 데이터를 로드해야 한다.
         crimeDetailViewModel.loadCrime(crimeId)
     }
 
@@ -43,12 +47,8 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
 
         titleField = view.findViewById(R.id.crime_title) as EditText
         dateButton = view.findViewById(R.id.crime_date) as Button
+        timeButton = view.findViewById(R.id.crime_time) as Button
         solvedCheckBox = view.findViewById(R.id.crime_solved) as CheckBox
-
-//        dateButton.apply {
-//            text = crime.date.toString()
-//            isEnabled = false
-//        }
 
         return view
     }
@@ -98,6 +98,13 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
                 show(this@CrimeFragment.parentFragmentManager, DIALOG_DATE)
             }
         }
+
+        timeButton.setOnClickListener {
+            TimePickerFragment.newInstance(crime.date.time).apply {
+                setTargetFragment(this@CrimeFragment, REQUEST_TIME)
+                show(this@CrimeFragment.parentFragmentManager, DIALOG_TIME)
+            }
+        }
     }
 
     override fun onStop() {
@@ -110,9 +117,15 @@ class CrimeFragment : Fragment(), DatePickerFragment.Callbacks {
         updateUI()
     }
 
+    override fun onTimeSelected(time: Date) {
+        crime.date = time
+        updateUI()
+    }
+
     private fun updateUI() {
         titleField.setText(crime.title)
         dateButton.text = crime.date.toString()
+//        timeButton.text = crime.date.time.toString()
         solvedCheckBox.isChecked = crime.isSolved
     }
 

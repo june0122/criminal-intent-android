@@ -4,4 +4,5 @@
     <string name="crime_title_label">제목</string>
     <string name="crime_details_label">상세 내역</string>
     <string name="crime_solved_label">해결됨</string>
+    <string name="crime_time_button">범죄 발생 시간 설정</string>
 </resources>

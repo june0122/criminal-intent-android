@@ -34,7 +34,6 @@ class DatePickerFragment : DialogFragment() {
 
         return DatePickerDialog(
             requireContext(),
-//            null,
             dateListener,
             initialYear,
             initialMonth,
