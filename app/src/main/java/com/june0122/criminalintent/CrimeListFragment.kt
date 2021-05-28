@@ -4,8 +4,10 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isEmpty
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +29,9 @@ class CrimeListFragment : Fragment() {
     }
 
     private var callbacks: Callbacks? = null
+
+    private lateinit var emptyListTextView: TextView
+    private lateinit var newCrimeButton: Button
 
     private lateinit var crimeRecyclerView: RecyclerView
     private var adapter: CrimeAdapter? = CrimeAdapter(emptyList())
@@ -52,6 +57,9 @@ class CrimeListFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_crime_list, container, false)
 
+        emptyListTextView = view.findViewById(R.id.empty_list_text)
+        newCrimeButton = view.findViewById(R.id.new_crime_button)
+
         crimeRecyclerView = view.findViewById(R.id.crime_recycler_view) as RecyclerView
         crimeRecyclerView.layoutManager = LinearLayoutManager(context)
         crimeRecyclerView.adapter = adapter
@@ -65,10 +73,31 @@ class CrimeListFragment : Fragment() {
             viewLifecycleOwner,
             Observer { crimes ->
                 crimes.let {
-                    Log.i(TAG, "Got crimes ${crimes.size}")
                     updateUI(crimes)
                 }
+
+                emptyListTextView.visibility = if (crimes.isEmpty()) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+
+                newCrimeButton.visibility = if (crimes.isEmpty()) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
             })
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        newCrimeButton.setOnClickListener {
+            val crime = Crime()
+            crimeListViewModel.addCrime(crime)
+            callbacks?.onCrimeSelected(crime.id)
+        }
     }
 
     override fun onDetach() {

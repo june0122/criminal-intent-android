@@ -6,4 +6,6 @@
     <string name="crime_solved_label">해결됨</string>
     <string name="crime_time_button">범죄 발생 시간 설정</string>
     <string name="new_crime">새로운 범죄</string>
+    <string name="empty_crime_list">범죄 데이터 없음</string>
+    <string name="new_crime_button">범죄 데이터 추가</string>
 </resources>
